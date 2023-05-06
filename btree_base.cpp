@@ -1,7 +1,7 @@
 #include "btree_base.hpp"
 
 u_int16_t getBTtype(BTreeNode *node) { return *(u_int16_t *)(node->data); }
-void setBTtype(BTreeNode *node, BTreeNodeTypes type) {
+void setBTtype(BTreeNode *node, u_int16_t type) {
   *(u_int16_t *)(node->data) = type;
 }
 
@@ -23,38 +23,39 @@ void setBTptr(BTreeNode *node, u_int16_t idx, u_int64_t ptr) {
   *(u_int64_t *)(node->data + pos) = ptr;
 }
 
-u_int16_t getBTOffsetPos(BTreeNode *node, u_int16_t idx){
-  if (idx == 0){
+u_int16_t getBTOffsetPos(BTreeNode *node, u_int16_t idx) {
+  if (idx == 0) {
     return 0;
   }
-  return HEADER + 8 * getBTnum_keys(node) + 2*(idx - 1);
+  return HEADER + 8 * getBTnum_keys(node) + 2 * (idx - 1);
 }
-u_int16_t getBTOffset(BTreeNode *node, u_int16_t idx){
-  return *(u_int16_t *)(node->data + getBTOffsetPos(node, idx)); 
+u_int16_t getBTOffset(BTreeNode *node, u_int16_t idx) {
+  return *(u_int16_t *)(node->data + getBTOffsetPos(node, idx));
 }
-void setBTOffset(BTreeNode *node, u_int16_t idx, u_int16_t offset){
-  *(u_int16_t *)(node->data + getBTOffsetPos(node, idx)) = offset; 
+void setBTOffset(BTreeNode *node, u_int16_t idx, u_int16_t offset) {
+  *(u_int16_t *)(node->data + getBTOffsetPos(node, idx)) = offset;
 }
 
-u_int16_t BTkvPos(BTreeNode *node, u_int16_t idx){
-  return HEADER+ 8 * getBTnum_keys(node) + 2 * getBTnum_keys(node) + getBTOffset(node, idx);
+u_int16_t BTkvPos(BTreeNode *node, u_int16_t idx) {
+  return HEADER + 8 * getBTnum_keys(node) + 2 * getBTnum_keys(node) +
+         getBTOffset(node, idx);
 }
-Bytes getBTKey(BTreeNode *node, u_int16_t idx){
+Bytes getBTKey(BTreeNode *node, u_int16_t idx) {
   assert(idx < getBTnum_keys(node));
   u_int16_t pos = BTkvPos(node, idx);
   u_int16_t klen = *(u_int16_t *)(node->data + pos);
 
-  Bytes bytes = Bytes{klen, (u_int8_t*)(node->data + pos + 4)};
+  Bytes bytes = Bytes{klen, (u_int8_t *)(node->data + pos + 4)};
   return bytes;
 }
 
-Bytes getBTVal(BTreeNode *node, u_int16_t idx){
+Bytes getBTVal(BTreeNode *node, u_int16_t idx) {
   assert(idx < getBTnum_keys(node));
   u_int16_t pos = BTkvPos(node, idx);
   u_int16_t klen = *(u_int16_t *)(node->data + pos);
   u_int16_t vlen = *(u_int16_t *)(node->data + pos + 2);
 
-  Bytes bytes = Bytes{vlen, (u_int8_t*)(node->data + pos + 4 + klen)};
+  Bytes bytes = Bytes{vlen, (u_int8_t *)(node->data + pos + 4 + klen)};
   return bytes;
 }
 

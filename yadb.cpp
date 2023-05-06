@@ -3,7 +3,7 @@
 #include <cstdlib>
 
 #include "btree_base.hpp"
-
+#include "btree_ops.hpp"
 
 int main() {
   BTinit();
@@ -14,7 +14,7 @@ int main() {
   setBTptr(node, 0, 5);
   setBTptr(node, 1, 7);
   setBTptr(node, 2, 9);
-  
+
   printf("%d \n", getBTnum_keys(node));
   printf("%lu \n", getBTptr(node, 0));
   printf("%lu \n", getBTptr(node, 1));

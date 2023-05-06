@@ -39,13 +39,13 @@ struct BTreeNode {
   u_int64_t data[0];
 };
 
-struct Bytes{
+struct Bytes {
   u_int16_t len;
-  u_int8_t* data;
+  u_int8_t *data;
 };
 
 u_int16_t getBTtype(BTreeNode *node);
-void setBTtype(BTreeNode *node, BTreeNodeTypes type);
+void setBTtype(BTreeNode *node, u_int16_t type);
 
 u_int16_t getBTnum_keys(BTreeNode *node);
 void setBTnum_keys(BTreeNode *node, u_int16_t num_keys);
@@ -56,6 +56,7 @@ void setBTptr(BTreeNode *node, u_int16_t idx, u_int64_t ptr);
 u_int16_t getBTOffset(BTreeNode *node, u_int16_t idx);
 void setBTOffset(BTreeNode *node, u_int16_t idx, u_int16_t offset);
 
+u_int16_t BTkvPos(BTreeNode *node, u_int16_t idx);
 Bytes getBTKey(BTreeNode *node, u_int16_t idx);
 Bytes getBTVal(BTreeNode *node, u_int16_t idx);
 
@@ -64,4 +65,3 @@ u_int16_t BTNodeSize(BTreeNode *node);
 void BTinit();
 
 #endif
-
