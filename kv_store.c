@@ -1,4 +1,4 @@
-#include "btree_ext.hpp"
+#include "btree_ext.h"
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include "stdio.h"
 
-struct KV {
+typedef struct {
   char *path;
 
   FILE *fp;
@@ -22,12 +22,12 @@ struct KV {
     u_int64_t flushed;
     char temp[0][0];
   } page;
-};
+} KV;
 
-struct MMapResult {
+typedef struct {
   int size;
   char *bytes;
-};
+} MMapResult;
 
 MMapResult mmapInit(FILE *fp) {
   struct stat sb;
@@ -39,7 +39,6 @@ MMapResult mmapInit(FILE *fp) {
     exit(1);
   }
 
-  fp.fd;
 
   int mmapSize = 64 << 20;
   assert(mmapSize % BTREE_PAGE_SIZE == 0);
@@ -50,7 +49,8 @@ MMapResult mmapInit(FILE *fp) {
   int fd = shm_open(fp, O_RDWR, S_IRUSR | S_IWUSR);
   void *addr = mmap(NULL, mmapSize, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 
-  return MMapResult{mmapSize, (char *)addr};
+  MMapResult result = {mmapSize, (char *)addr};
+  return result;
 }
 
 void extendMmap(KV *kv, int npages) {
