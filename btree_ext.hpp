@@ -14,14 +14,12 @@ struct BTree {
 #include <iostream>
 #include <map>
 
-
-class TestHarness{
+class TestHarness {
 public:
-    BTree *tree = 0;
-    std::map<std::string, std::string> reference_map;
-    std::map<u_int64_t, BTreeNode*> pages;
+  BTree *tree = 0;
+  std::map<std::string, std::string> reference_map;
+  std::map<u_int64_t, BTreeNode *> pages;
 };
-
 
 void testBTree();
 #endif
