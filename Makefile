@@ -1,6 +1,6 @@
 .SUFFIXES:
 	
-CXX = clang -std=c++14 -Wall
+CXX = clang -std=c++14 -Wall -lstdc++ -g -fstack-protector-all -fsanitize=address
 
 MAIN=yadb
 

@@ -1,6 +1,9 @@
 #ifndef _btree_base_hpp_INCLUDED
 #define _btree_base_hpp_INCLUDED
 
+// #define DEBUG
+// #define INFO
+
 #include <cassert>
 #include <cstdio>
 #include <cstdlib>
