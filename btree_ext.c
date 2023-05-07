@@ -35,19 +35,19 @@ void initTestHarness() {
   harness->tree->dealloc_page = test_deallocate_page;
 }
 
-void add(char* key, char* val) {
+void add(char *key, char *val) {
   Bytes key_bytes = {(uint16_t)(((uint8_t)strlen(key) + 1)), (uint8_t *)key};
   Bytes val_bytes = {(uint16_t)(((uint8_t)strlen(val) + 1)), (uint8_t *)val};
   // printf("INSERTING: size: %d, string: %s\n", key_bytes.len, key_bytes.data);
   BTInsert(harness->tree, key_bytes, val_bytes);
 }
 
-char *find(char* key) {
+char *find(char *key) {
   Bytes key_bytes = {(uint16_t)strlen(key), (uint8_t *)key};
   return (char *)BTFind(harness->tree, key_bytes).data;
 }
 
-int delete_(char* key) {
+int delete_(char *key) {
   Bytes key_bytes = {(uint16_t)strlen(key), (uint8_t *)key};
   return BTDelete(harness->tree, key_bytes);
 }

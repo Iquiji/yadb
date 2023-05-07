@@ -17,7 +17,7 @@ $(MAIN): $(MAIN).o $(OBJ)
 	$(CXX) -o $@ $^
 
 format:
-	clang-format -i *.[ch]pp
+	clang-format -i *.[ch]
 
 clean:
 	rm -rf *.o $(MAIN) $(TEST)

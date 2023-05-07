@@ -4,7 +4,6 @@
 
 #include "btree_base.h"
 
-
 typedef struct {
   uint64_t root;
   BTreeNode *(*get_node)(uint64_t);

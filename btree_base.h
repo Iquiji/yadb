@@ -5,9 +5,9 @@
 // #define INFO
 
 #include "assert.h"
+#include "stdint.h"
 #include "stdio.h"
 #include "stdlib.h"
-#include "stdint.h"
 
 #define HEADER 4
 #define BTREE_PAGE_SIZE 4096

@@ -2,22 +2,22 @@
 #include "strings.h"
 
 void BTreeNodeInfo(BTreeNode *node) {
-#ifdef DEBUG
-  // printf("INFO BTreeNode:\n");
-  // printf(" - type: %d\n",getBTtype(node));
-  // printf(" - nkeys: %d\n",getBTnum_keys(node));
+#ifndef DEBUG
+  printf("INFO BTreeNode: %lx\n", node);
+  printf(" - type: %d\n",getBTtype(node));
+  printf(" - nkeys: %d\n",getBTnum_keys(node));
   for (int i = 0; i < getBTnum_keys(node); ++i) {
-    // printf("  - Pointer: %lx\n",getBTptr(node,i));
-    // printf("  - Offset: %d\n",getBTOffset(node,i));
+    printf("  - Pointer: %lx\n",getBTptr(node,i));
+    printf("  - Offset: %d\n",getBTOffset(node,i));
     uint16_t pos = BTkvPos(node, i);
     uint16_t key_len = *(uint16_t *)((char *)node + pos);
     uint16_t val_len = *(uint16_t *)((char *)node + pos + 2);
-    // printf("  - key len: %d, data: '", key_len);
+    printf("  - key len: %d, data: '", key_len);
     fwrite((char *)node + pos + 4, 1, key_len, stdout);
-    // printf("'\n");
-    // printf("  - val len: %d, data: '", val_len);
+    printf("'\n");
+    printf("  - val len: %d, data: '", val_len);
     fwrite((char *)node + pos + key_len + 4, 1, val_len, stdout);
-    // printf("'\n\n");
+    printf("'\n\n");
   }
 #endif
 }
@@ -109,7 +109,7 @@ void BTleafInsert(BTreeNode *old_node, BTreeNode *new_node, uint16_t idx,
   setBTnum_keys(new_node, getBTnum_keys(old_node) + 1);
 
   BTNodeAppendRange(old_node, new_node, 0, 0, idx);
-  BTreeNodeInfo(new_node);
+  // BTreeNodeInfo(new_node);
   BTNodeAppendKV(new_node, idx, 0, key, val);
   BTNodeAppendRange(old_node, new_node, idx + 1, idx, getBTnum_keys(old_node) - idx);
 }
@@ -140,7 +140,7 @@ BTreeNode *BTreeInsert(BTree *tree, BTreeNode *node, Bytes key, Bytes val) {
   // where to insert key?
   uint16_t idx = BTNodeLookupLE(node, key);
   // printf("Insert idx: %hu\n",idx);
-  BTreeNodeInfo(node);
+  // BTreeNodeInfo(node);
   switch (getBTtype(node)) {
   case BNODE_INVALID:
     fprintf(stderr, "INVALID NODE: INSERT\n");
@@ -259,7 +259,7 @@ SplitHolder BTNodeSplit3(BTreeNode *old_node) {
   return res;
 }
 
-const Bytes EMPTY_BYTES =  {0, 0};
+const Bytes EMPTY_BYTES = {0, 0};
 
 // replace a link with multiple links
 void BTNodeReplaceKidN(BTree *tree, BTreeNode *new_node, BTreeNode *old_node, uint16_t idx, SplitHolder split) {
@@ -274,7 +274,7 @@ void BTNodeReplaceKidN(BTree *tree, BTreeNode *new_node, BTreeNode *old_node, ui
 
   BTNodeAppendRange(old_node, new_node, 0, 0, idx);
   for (int i = 0; i < split.size; ++i) {
-    
+
     BTNodeAppendKV(new_node, idx + i, tree->new_page(split.splitted[i]), getBTKey(split.splitted[i], 0), EMPTY_BYTES);
   }
   BTNodeAppendRange(old_node, new_node, idx + split.size, idx + 1, getBTnum_keys(old_node) - (idx + 1));
@@ -285,14 +285,14 @@ void BTLeafDelete(BTreeNode *new_node, BTreeNode *old_node, uint16_t idx) {
   // printf("BTLeafDelete %hu\n", idx);
   setBTtype(new_node, getBTtype(old_node));
   setBTnum_keys(new_node, getBTnum_keys(old_node) - 1);
-  BTreeNodeInfo(old_node);
-  BTreeNodeInfo(new_node);
+  // BTreeNodeInfo(old_node);
+  // BTreeNodeInfo(new_node);
   // printf("first\n");
   BTNodeAppendRange(old_node, new_node, 0, 0, idx);
   // printf("second\n");
   BTNodeAppendRange(old_node, new_node, idx, idx + 1, getBTnum_keys(old_node) - idx - 1);
   // printf("after second copy: \n");
-  BTreeNodeInfo(new_node);
+  // BTreeNodeInfo(new_node);
   // printf("end\n\n\n\n");
 }
 
@@ -403,7 +403,7 @@ BTreeNode *BTreeDelete(BTree *tree, BTreeNode *node, Bytes key) {
       memset(new_node, 0, BTREE_PAGE_SIZE);
 
       BTLeafDelete(new_node, node, idx);
-      BTreeNodeInfo(new_node);
+      // BTreeNodeInfo(new_node);
       return new_node;
     } else {
       // Not found!
@@ -427,7 +427,7 @@ int BTDelete(BTree *tree, Bytes key) {
   }
 
   // printf("DELETING %s\n", key.data);
-  BTreeNodeInfo(tree->get_node(tree->root));
+  // BTreeNodeInfo(tree->get_node(tree->root));
 
   BTreeNode *updated = BTreeDelete(tree, tree->get_node(tree->root), key);
   if (updated == 0) {
@@ -465,7 +465,7 @@ void BTInsert(BTree *tree, Bytes key, Bytes val) {
     BTNodeAppendKV(new_root, 0, 0, one_size_bytes, one_size_bytes);
     BTNodeAppendKV(new_root, 1, 0, key, val);
     tree->root = tree->new_page(new_root);
-    BTreeNodeInfo(new_root);
+    // BTreeNodeInfo(new_root);
     return;
   }
 
@@ -487,11 +487,11 @@ void BTInsert(BTree *tree, Bytes key, Bytes val) {
   } else {
     tree->root = tree->new_page(split.splitted[0]);
   }
-  BTreeNodeInfo(root);
+  // BTreeNodeInfo(root);
 }
 
 Bytes BTreeFind(BTree *tree, BTreeNode *node, Bytes key) {
-  BTreeNodeInfo(node);
+  // BTreeNodeInfo(node);
   uint16_t idx = BTNodeLookupLE(node, key);
 
   switch (getBTtype(node)) {
