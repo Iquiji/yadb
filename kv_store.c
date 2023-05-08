@@ -37,6 +37,7 @@ char *appendToMMapResultList(MMapResult *list, int size, MMapResult new_element)
   MMapResult *new_list = (MMapResult *)malloc((size + 1) * 16);
   memcpy(new_list, list, size * 16);
   new_list[size] = new_element;
+  return new_list;
 }
 
 void extendMmap(KV *kv, int npages) {
@@ -51,7 +52,7 @@ void extendMmap(KV *kv, int npages) {
   kv->mmap.total *= 2;
   void *old_chunks = kv->mmap.chunks;
   kv->mmap.chunks = appendToMMapResultList(kv->mmap.chunks, kv->mmap.num_chunks, result);
-  free(old_chunks);
+  // free(old_chunks);
   kv->mmap.num_chunks += 1;
 }
 
@@ -61,12 +62,15 @@ const char *DB_SIG = "MyKVDB.........";
 
 BTreeNode *page_get_callback(uint64_t page_ptr) {
   uint64_t start = 0;
-  uint64_t end = 0;
-
-  if (global_kv.mmap.num_chunks > 1) printf("global_kv.mmap.num_chunks > 1: %d\n", global_kv.mmap.num_chunks);
 
   for (int i = 0; i < global_kv.mmap.num_chunks; ++i) {
-    end = start + global_kv.mmap.chunks[i].size / BTREE_PAGE_SIZE;
+    uint64_t end = start + global_kv.mmap.chunks[i].size / BTREE_PAGE_SIZE;
+    // if (global_kv.mmap.num_chunks > 1) {
+    //   printf("global_kv.mmap.num_chunks > 1: %d\n", global_kv.mmap.num_chunks);
+    //   printf("page_ptr: %lu", page_ptr);
+    //   printf("start: %lu, end: %lu\n", start);
+    // }
+
     if (page_ptr < end) {
       uint64_t offset = BTREE_PAGE_SIZE * (page_ptr - start);
       // printf("MmapResult: size: %lu\n", global_kv.mmap.chunks[i].size);
@@ -75,6 +79,7 @@ BTreeNode *page_get_callback(uint64_t page_ptr) {
       // BTreeNodeInfo(res);
       return res;
     }
+    start = end;
   }
 
   fprintf(stderr, "BAD Page Pointer: %lx", page_ptr);
