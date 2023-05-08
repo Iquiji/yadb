@@ -37,6 +37,8 @@ char *appendToMMapResultList(MMapResult *list, int size, MMapResult new_element)
   MMapResult *new_list = (MMapResult *)malloc((size + 1) * 16);
   memcpy(new_list, list, size * 16);
   new_list[size] = new_element;
+
+  if (list != 0) free(list);
   return new_list;
 }
 
@@ -100,15 +102,15 @@ void masterPageLoad() {
   uint64_t root = *(uint64_t *)(data.bytes + 16);
   uint64_t used = *(uint64_t *)(data.bytes + 24);
 
-  if (memcmp(DB_SIG, (char *)global_kv.mmap.chunks, 16) != 0) {
-    fprintf(stderr, "BAD Page Signature!");
+  if (memcmp(DB_SIG, data.bytes, 16) != 0) {
+    fprintf(stderr, "BAD Page Signature!\n");
     exit(1);
   }
 
   uint64_t bad = !(1 <= used && used <= global_kv.mmap.file / BTREE_PAGE_SIZE);
   bad = bad || !(0 <= root && root < used);
   if (bad) {
-    fprintf(stderr, "BAD Master Page!");
+    fprintf(stderr, "BAD Master Page!\n");
     exit(1);
   }
 
@@ -138,6 +140,7 @@ char *appendToBTreeNodeList(char *list, int size, BTreeNode *new_element) {
   // if (size > 0) printf("new_list[size - 1] = %lx\n",new_list [size - 1]);
   // new_list[size] = new_element;
 
+  if (list != 0) free(list);
   return new_list;
 }
 
@@ -154,7 +157,7 @@ uint64_t page_new_callback(BTreeNode *node_ptr) {
   global_kv.page.temp = new_page_temp;
   // TODO:
   // printf("Want to free %lx\n", old_temp);
-  // free(old_temp);
+
   global_kv.page.num_temp += 1;
 
   // printf("global_kv.page.temp: %lx: \n", global_kv.page.temp);
@@ -272,6 +275,9 @@ void kvWritePages() {
     // BTreeNodeInfo((void*)(((uint64_t*)global_kv.page.temp)[i]));
 
     memcpy(page_get_callback(ptr), (void*)(((uint64_t*)global_kv.page.temp)[i]), BTREE_PAGE_SIZE);
+    
+    // Free so we dont leak memory!
+    free(((void**)global_kv.page.temp)[i]);
   }
 }
 
@@ -280,6 +286,8 @@ void kvSyncPages() {
   global_kv.page.flushed += global_kv.page.num_temp;
   free(global_kv.page.temp);
   global_kv.page.num_temp = 0;
+  global_kv.page.temp = 0;
+
 
   masterPageStore();
   fsync(global_kv.fd);

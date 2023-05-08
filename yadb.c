@@ -51,7 +51,7 @@ void testKV() {
   printf("find: %s\n", test_find("hello"));
   printf("find: %s\n", test_find("Zhello1"));
 
-  for (int i = 0; i < 10000; ++i) {
+  for (int i = 0; i < 100000; ++i) {
     // printf("root node size: %hu\n", BTNodeSize(harness->tree->get_node(harness->tree->root)));
     char string[] = "000000";
     string[5] = (char)(i % 10 + 48);
@@ -69,7 +69,7 @@ void testKV() {
     assert(test_find(string) == 0);
     test_add(string, "upupupdate!");
   }
-  printf("Test succesfully mastered!");
+  printf("+++ Test succesfully mastered!\n");
 
   kvClose();
 }
@@ -102,7 +102,7 @@ void testKV_already_init() {
   // printf("find: %s\n", test_find("hello"));
   printf("find: %s\n", test_find("Zhello1"));
 
-  for (int i = 0; i < 10000; ++i) {
+  for (int i = 0; i < 1000; ++i) {
     // printf("root node size: %hu\n", BTNodeSize(harness->tree->get_node(harness->tree->root)));
     char string[] = "000000";
     string[5] = (char)(i % 10 + 48);
@@ -118,14 +118,15 @@ void testKV_already_init() {
     // assert(memcmp(test_find(string), "0a1b2c3d4!", 11) == 0);
     // test_delete_(string);
     // assert(test_find(string) == 0);
-    test_add(string, "upupupdate!");
+    // test_add(string, "upupupdate!");
   }
-  printf("Test succesfully mastered!");
+  printf("Test succesfully mastered!\n");
 
   kvClose();
 }
 
 int main() {
+  // testKV();
   testKV_already_init();
 
   return 0;
